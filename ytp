@@ -10,14 +10,12 @@ cyan="\033[36;1m"
 green="\033[32;1m"
 nc="\033[m"
 
-if ! hash jq 2>/dev/null; then
-	echo -e "This script requires the ${magenta}jq${nc} command. It's probably in your repos."
-	exit
-fi
-if ! hash youtube-dl 2>/dev/null; then
-	echo -e "This script requires the ${magenta}youtube-dl${nc} command. It's probably in your repos."
-	exit
-fi
+for thing in jq youtube-dl; do
+	if ! hash $thing 2>/dev/null; then
+		echo -e "This script requires the ${magenta}$thing${nc} command. It's probably in your repos."
+		exit
+	fi
+done
 if ! hash $player 2>/dev/null; then
 	echo -e "You do not have ${magenta}$player${nc} installed. Please install it or choose another player."
 	exit
