@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## ytp
+## by drew
+## uo.is.ou@gmail.com
+## GPL v. 2
+
 api_key="AIzaSyB-7sMMx9lMexjq3ZWZAzw3Csi7zOF98nE"
 # these API keys have quotas. If you hit limits, create your own here: https://console.developers.google.com/
 maxresults=5
@@ -21,14 +26,18 @@ if ! hash $player 2>/dev/null; then
 	exit
 fi
 
-if [[ "$#" -lt 1 ]] || [[ "$#" -gt 2 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
+if [[ "$#" -gt 2 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
 	echo -e "Usage: `basename $0` \"some search\" [maxresults]\n\nwhere [maxresults] is an integer from 1 to 10 (defaults to $maxresults)"
 	exit
 elif [[ ! -z "$2" ]] && [[ "$2" =~ ^[0-9]+$ ]] && [[ "$2" -le 10 ]] && [[ "$2" -ge 1 ]]; then
 	maxresults=$2
 fi
+
 searchterm=$1
 
+if [[ "$searchterm" = "" ]]; then
+    searchterm="village people ymca"
+fi
 
 api_url="https://www.googleapis.com/youtube/v3/search"
 video_url="https://www.youtube.com/watch?v="
@@ -36,7 +45,6 @@ pagenum=1
 searchtype="search"
 letters=(s d f j k l w e i o)
 declare -A numbers=([s]=1 [d]=2 [f]=3 [j]=4 [k]=5 [l]=6 [w]=7 [e]=8 [i]=9 [o]=10)
-
 
 ytsearch () {
 	echo "Searching ..."
@@ -60,7 +68,12 @@ search_header () {
 	echo -e "Searched for: $searchterm\nPage: $pagenum\n"
 }
 search_footer () {
-	echo -e "\nEnter a ${magenta}number${nc} to watch the video in $player. Enter a ${cyan}letter${nc} for more information and related videos."
+	echo -e "\nEnter a ${magenta}number${nc} to watch the video in $player."
+	if [[ "$player" = "mpv" ]] ; then
+        echo -e "Enter a ${magenta}Capital Letter${nc} to play only the audio portion of the video."
+    fi
+	echo -e "Enter a ${cyan}letter${nc} for more information and related videos."
+
 	nexttext=""
 	if [[ "$next" != "null" ]]; then
 		nexttext="[${green}n${nc}]ext page"
@@ -88,8 +101,8 @@ draw_details () {
 	echo -e "\n  Published: $pdate"
 	echo -e "  url: $video_url$vidid\n"
 	details_footer
-
 }
+
 details_footer () {
 	echo -e "[${green}w${nc}]atch, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
 	command_line
@@ -111,6 +124,17 @@ handle_input () {
 				command_line "Invalid number"
 			fi
 			;;
+		[SDFJKLERIO] )
+            userinput=${numbers[${userinput,,}]}
+            if [[ "$player" = "mpv" ]] && [[ $userinput -le $maxresults ]]; then
+				playvid=$(( $userinput - 1 ))
+				echo "Launching $player"
+				$player --no-video $video_url${vididsa[$playvid]} 1>/dev/null 2>&1
+				command_line
+			else
+				command_line "Invalid command"
+			fi
+			;;			
 		n )
 			if [[ "$next" != "null" ]]; then
 				pagenum=$(( pagenum + 1 ))
@@ -195,16 +219,19 @@ draw_search () {
 	mapfile -t vidtitlesa < <( printf "%s\n" "$vidtitles" )
 	for v in "${!vididsa[@]}"; do
 		n=$(( $v + 1 ))
-		sep="  "
+		sep=" "
 		if [ "$n" -ge 10 ]; then
-			sep=" "
+			sep=""
 		fi
-		echo -e "  ${magenta}$n${nc}.$sep[${cyan}${letters[$v]}${nc}] ${vidtitlesa[$v]}"
+		echo -en "  $sep${magenta}$n${nc}. "
+		if [[ "$player" = "mpv" ]]; then 
+            echo -en "[${magenta}${letters[$v]^^}${nc}] "
+        fi
+		echo -e "[${cyan}${letters[$v]}${nc}] ${vidtitlesa[$v]}"
 	done
 	search_footer
 	command_line
 }
 
 ytsearch
-
 
