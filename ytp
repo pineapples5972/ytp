@@ -13,6 +13,7 @@ player="mpv"
 magenta="\033[35;1m"
 cyan="\033[36;1m"
 green="\033[32;1m"
+yellow="\033[33;1m"
 nc="\033[m"
 
 for thing in jq youtube-dl; do
@@ -70,7 +71,7 @@ search_header () {
 search_footer () {
 	echo -e "\nEnter a ${magenta}number${nc} to watch the video in $player."
 	if [[ "$player" = "mpv" ]] ; then
-        echo -e "Enter a ${magenta}Capital Letter${nc} to play only the audio portion of the video."
+        echo -e "Enter a ${yellow}Capital Letter${nc} to play only the audio portion of the video."
     fi
 	echo -e "Enter a ${cyan}letter${nc} for more information and related videos."
 
@@ -225,7 +226,7 @@ draw_search () {
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
 		if [[ "$player" = "mpv" ]]; then 
-            echo -en "[${magenta}${letters[$v]^^}${nc}] "
+            echo -en "[${yellow}${letters[$v]^^}${nc}] "
         fi
 		echo -e "[${cyan}${letters[$v]}${nc}] ${vidtitlesa[$v]}"
 	done
