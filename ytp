@@ -118,7 +118,7 @@ draw_details () {
 
 details_footer () {
 	if $showhelp; then
-		echo -e "[${green}w${nc}]atch, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+		echo -e "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
 	fi
 	command_line
 }
@@ -245,6 +245,11 @@ handle_input () {
 		w )
 			echo -e "Opening ${red}$vidtitle${nc} in $player"
 			$player $video_url$vidid 1>/dev/null 2>&1 &
+			command_line
+			;;
+		u )
+			echo -e "Opening ${red}$vidtitle${nc} (audio only) in $player"
+			$player --no-video --player-operation-mode=pseudo-gui $video_url$vidid 1>/dev/null 2>&1 &
 			command_line
 			;;
 		m )
