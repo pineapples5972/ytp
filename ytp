@@ -134,6 +134,51 @@ add_to_playlist () {
 	fi
 }
 
+new_maxresults () {
+	read -p "Enter a number (1-10): " newmaxresults
+	if [[ "$newmaxresults" =~ ^[0-9]+$ ]] && [[ "$newmaxresults" -le 10 ]] && [[ "$newmaxresults" -ge 1 ]]; then
+		maxresults=$newmaxresults
+		pagenum=1
+		if [[ "$searchtype" = "search" ]]; then
+			ytsearch
+		else
+			search_related
+		fi
+	else
+		echo "Invalid number, try again..."
+		new_maxresults
+	fi
+
+}
+command_line () {
+	if [[ ! -z "$1" ]]; then
+		echo $1
+	fi
+	read -p "Command: " userinput
+	handle_input
+}
+
+draw_search () {
+	search_header
+	vidids=$(echo $videolist | jq -r "[.][].items[].id.videoId")
+	mapfile -t vididsa < <( printf "%s\n" "$vidids" )
+	vidtitles=$(echo $videolist | jq -r "[.][].items[].snippet.title")
+	mapfile -t vidtitlesa < <( printf "%s\n" "$vidtitles" )
+	for v in "${!vididsa[@]}"; do
+		n=$(( $v + 1 ))
+		sep=" "
+		if [ "$n" -ge 10 ]; then
+			sep=""
+		fi
+		echo -en "  $sep${magenta}$n${nc}. "
+        echo -en "[${yellow}${letters[$v]^^}${nc}] "
+		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitlesa[$v]}${nc}"
+	done
+	echo ""
+	search_footer
+	command_line
+}
+
 handle_input () {
 	case $userinput in
 		[asdfjkleri] )
@@ -237,51 +282,6 @@ handle_input () {
 			;;
 	esac
 
-}
-
-new_maxresults () {
-	read -p "Enter a number (1-10): " newmaxresults
-	if [[ "$newmaxresults" =~ ^[0-9]+$ ]] && [[ "$newmaxresults" -le 10 ]] && [[ "$newmaxresults" -ge 1 ]]; then
-		maxresults=$newmaxresults
-		pagenum=1
-		if [[ "$searchtype" = "search" ]]; then
-			ytsearch
-		else
-			search_related
-		fi
-	else
-		echo "Invalid number, try again..."
-		new_maxresults
-	fi
-
-}
-command_line () {
-	if [[ ! -z "$1" ]]; then
-		echo $1
-	fi
-	read -p "Command: " userinput
-	handle_input
-}
-
-draw_search () {
-	search_header
-	vidids=$(echo $videolist | jq -r "[.][].items[].id.videoId")
-	mapfile -t vididsa < <( printf "%s\n" "$vidids" )
-	vidtitles=$(echo $videolist | jq -r "[.][].items[].snippet.title")
-	mapfile -t vidtitlesa < <( printf "%s\n" "$vidtitles" )
-	for v in "${!vididsa[@]}"; do
-		n=$(( $v + 1 ))
-		sep=" "
-		if [ "$n" -ge 10 ]; then
-			sep=""
-		fi
-		echo -en "  $sep${magenta}$n${nc}. "
-        echo -en "[${yellow}${letters[$v]^^}${nc}] "
-		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitlesa[$v]}${nc}"
-	done
-	echo ""
-	search_footer
-	command_line
 }
 
 ytsearch
