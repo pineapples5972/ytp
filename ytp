@@ -9,25 +9,22 @@
 api_key="AIzaSyB-7sMMx9lMexjq3ZWZAzw3Csi7zOF98nE"
 # these API keys have quotas. If you hit limits, create your own here: https://console.developers.google.com/
 maxresults=5
-player="mpv"
+player="mpv" # mpv works, try other players at your own P E R I L
 
 magenta="\033[35;1m"
 cyan="\033[36;1m"
 green="\033[32;1m"
 yellow="\033[33;1m"
-red="\033[31;1m"
+red="\033[31m"
+bold="\e[1m"
 nc="\033[m"
 
-for thing in jq youtube-dl; do
+for thing in jq youtube-dl mktemp $player; do
 	if ! hash $thing 2>/dev/null; then
-		echo -e "This script requires the ${magenta}$thing${nc} command. It's probably in your repos."
+		echo -e "This script requires ${magenta}$thing${nc}. It's probably in your repos."
 		exit
 	fi
 done
-if ! hash $player 2>/dev/null; then
-	echo -e "You do not have ${magenta}$player${nc} installed. Please install it or choose another player."
-	exit
-fi
 
 if [[ "$#" -gt 2 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
 	echo -e "Usage: `basename $0` \"some search\" [maxresults]\n\nwhere [maxresults] is an integer from 1 to 10 (defaults to $maxresults)"
@@ -45,6 +42,7 @@ fi
 api_url="https://www.googleapis.com/youtube/v3/search"
 video_url="https://www.youtube.com/watch?v="
 pagenum=1
+showhelp=true
 searchtype="search"
 letters=(a s d f j k l w e i)
 declare -A numbers=([a]=1 [s]=2 [d]=3 [f]=4 [j]=5 [k]=6 [l]=7 [w]=8 [e]=9 [i]=10)
@@ -76,25 +74,28 @@ search_header () {
 	echo -e "Page: $pagenum\n"
 }
 search_footer () {
-	echo -e "\nEnter a ${magenta}number${nc} to watch the video in $player."
-	if [[ "$player" = "mpv" ]] ; then
-        echo -e "Enter a ${yellow}Capital Letter${nc} to play only the audio portion of the video."
-    fi
-	echo -e "Enter a ${cyan}letter${nc} for more information and related videos."
+	if $showhelp; then
+		echo -e "Enter a ${magenta}number${nc} to watch the video in $player. Add a ${bold}!${nc} to add to playlist."
+    	echo -e "Enter a ${yellow}Capital Letter${nc} to play only the audio portion of the video."
+		echo -e "Enter a ${cyan}letter${nc} for more information and related videos."
 
-	nexttext=""
-	if [[ "$next" != "null" ]]; then
-		nexttext="[${green}n${nc}]ext page"
-	fi
-	if [[ "$prev" != "null" ]]; then
-		nextsep=""
-		if [[ "$nexttext" != "" ]]; then
-			nextsep=", "
+		nexttext=""
+		if [[ "$next" != "null" ]]; then
+			nexttext="[${green}n${nc}]ext page"
 		fi
-		nexttext="$nexttext$nextsep[${green}p${nc}]revious page"
+		if [[ "$prev" != "null" ]]; then
+			nextsep=""
+			if [[ "$nexttext" != "" ]]; then
+				nextsep=", "
+			fi
+			nexttext="$nexttext$nextsep[${green}p${nc}]revious page"
+		fi
+		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle showing of help"
+		if [[ ! -z $playlistfile ]]; then
+			nexttext="$nexttext, [${green}t${nc}] play playlist"
+		fi
+		echo -e $nexttext
 	fi
-	nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results"
-	echo -e $nexttext
 }
 
 draw_details () {
@@ -103,7 +104,7 @@ draw_details () {
 	channeltitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.channelTitle")
 	pubdate=$(echo $videolist | jq -r "[.][].items[$1].snippet.publishedAt")
 	description=$(echo $videolist | jq -r "[.][].items[$1].snippet.description")
-	echo -e "\n  ${red}$vidtitle${nc}"
+	echo -e "\n  ${bold}${red}$vidtitle${nc}"
 	echo -e "  by $channeltitle"
 	echo -e "\n$description"
 	pdate=$(date -d "$pubdate" "+%A %-d %B, %Y")
@@ -113,8 +114,24 @@ draw_details () {
 }
 
 details_footer () {
-	echo -e "[${green}w${nc}]atch, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+	if $showhelp; then
+		echo -e "[${green}w${nc}]atch, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+	fi
 	command_line
+}
+
+add_to_playlist () {
+	if [[ -z "$playlistfile" ]]; then
+		playlistfile=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
+		playlistfile="$playlistfile/playlist.m3u"
+		firstitem=true
+	fi
+	echo $video_url${vididsa[$1]} >> $playlistfile
+	echo -e "Added ${red}${vidtitlesa[$1]}${nc} to playlist."
+	if $firstitem; then
+		echo -e "([${green}t${nc}] to play playlist)"
+		firstitem=false
+	fi
 }
 
 handle_input () {
@@ -126,7 +143,7 @@ handle_input () {
 		[1-9]|10 )
 			if [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput -1 ))
-				echo "Launching $player"
+				echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} in $player"
 				$player $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
 				command_line
 			else
@@ -135,15 +152,22 @@ handle_input () {
 			;;
 		[ASDFJKLERI] )
             userinput=${numbers[${userinput,,}]}
-            if [[ "$player" = "mpv" ]] && [[ $userinput -le $maxresults ]]; then
+            if [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput - 1 ))
-				echo "Launching $player"
+				echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
 				$player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
 				command_line
 			else
 				command_line "Invalid command"
 			fi
 			;;			
+		[1-9]!|10! )
+			addvid=$(( $(echo $userinput | cut -d "!" -f 1) - 1 ))
+			if [[ $(( $addvid + 1 )) -le $maxresults ]]; then
+				add_to_playlist $addvid
+			fi
+			command_line
+			;;
 		n )
 			if [[ "$next" != "null" ]]; then
 				pagenum=$(( pagenum + 1 ))
@@ -170,7 +194,7 @@ handle_input () {
 			new_maxresults
 			;;
 		w )
-			echo "Launching $player"
+			echo -e "Opening ${red}$vidtitle${nc} in $player"
 			$player $video_url$vidid 1>/dev/null 2>&1 &
 			command_line
 			;;
@@ -182,6 +206,25 @@ handle_input () {
 				searchtype="related"
 				search_related
 			fi
+			;;
+		t )
+			if [[ ! -z $playlistfile ]]; then
+				$player $playlistfile 1>/dev/null 2>&1 &
+				echo "Opening playlist in $player"
+				command_line
+			else
+				command_line "Invalid command"
+			fi
+			;;
+		? )
+			if $showhelp; then 
+				showhelp=false
+				echo "Help is now off"
+			else
+				showhelp=true
+				echo "Help is now on"
+			fi
+			command_line
 			;;
 		b )
 			draw_search
@@ -233,11 +276,10 @@ draw_search () {
 			sep=""
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
-		if [[ "$player" = "mpv" ]]; then 
-            echo -en "[${yellow}${letters[$v]^^}${nc}] "
-        fi
-		echo -e "[${cyan}${letters[$v]}${nc}] ${vidtitlesa[$v]}"
+        echo -en "[${yellow}${letters[$v]^^}${nc}] "
+		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitlesa[$v]}${nc}"
 	done
+	echo ""
 	search_footer
 	command_line
 }
