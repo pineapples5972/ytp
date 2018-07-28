@@ -36,7 +36,7 @@ fi
 searchterm=$1
 
 if [[ "$searchterm" = "" ]]; then
-    searchterm="friday"
+	searchterm="friday"
 fi
 
 api_url="https://www.googleapis.com/youtube/v3/search"
@@ -76,7 +76,7 @@ search_header () {
 search_footer () {
 	if $showhelp; then
 		echo -e "Enter a ${magenta}number${nc} to watch the video in $player. Add a ${bold}!${nc} to add to playlist."
-    	echo -e "Enter a ${yellow}Capital Letter${nc} to play only the audio portion of the video."
+		echo -e "Enter a ${yellow}Capital Letter${nc} to play only the audio portion of the video."
 		echo -e "Enter a ${cyan}letter${nc} for more information and related videos."
 
 		nexttext=""
@@ -171,7 +171,7 @@ draw_search () {
 			sep=""
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
-        echo -en "[${yellow}${letters[$v]^^}${nc}] "
+		echo -en "[${yellow}${letters[$v]^^}${nc}] "
 		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitlesa[$v]}${nc}"
 	done
 	echo ""
@@ -196,8 +196,8 @@ handle_input () {
 			fi
 			;;
 		[ASDFJKLERI] )
-            userinput=${numbers[${userinput,,}]}
-            if [[ $userinput -le $maxresults ]]; then
+			userinput=${numbers[${userinput,,}]}
+			if [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput - 1 ))
 				echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
 				$player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
@@ -285,3 +285,4 @@ handle_input () {
 }
 
 ytsearch
+
