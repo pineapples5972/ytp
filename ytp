@@ -281,8 +281,6 @@ handle_input () {
 			command_line "Invalid command"
 			;;
 	esac
-
 }
 
 ytsearch
-
