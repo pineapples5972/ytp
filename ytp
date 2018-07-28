@@ -216,7 +216,7 @@ handle_input () {
 				command_line "Invalid command"
 			fi
 			;;
-		? )
+		"?" )
 			if $showhelp; then 
 				showhelp=false
 				echo "Help is now off"
