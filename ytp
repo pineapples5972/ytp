@@ -104,7 +104,7 @@ draw_details () {
 	pubdate=$(echo $videolist | jq -r "[.][].items[$1].snippet.publishedAt")
 	description=$(echo $videolist | jq -r "[.][].items[$1].snippet.description")
 	echo -e "\n  ${red}$vidtitle${nc}"
-	echo -e "\n  by $channeltitle"
+	echo -e "by $channeltitle"
 	echo -e "\n$description"
 	pdate=$(date -d "$pubdate" "+%A %-d %B, %Y")
 	echo -e "\n  Published: $pdate"
