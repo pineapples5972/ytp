@@ -15,6 +15,7 @@ magenta="\033[35;1m"
 cyan="\033[36;1m"
 green="\033[32;1m"
 yellow="\033[33;1m"
+red="\033[31;1m"
 nc="\033[m"
 
 for thing in jq youtube-dl; do
@@ -99,10 +100,11 @@ search_footer () {
 draw_details () {
 	vidid=$(echo $videolist | jq -r "[.][].items[$1].id.videoId")
 	vidtitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.title")
-	channeltitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.channeltitle")
+	channeltitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.channelTitle")
 	pubdate=$(echo $videolist | jq -r "[.][].items[$1].snippet.publishedAt")
 	description=$(echo $videolist | jq -r "[.][].items[$1].snippet.description")
-	echo -e "\n  $vidtitle"
+	echo -e "\n  ${red}$vidtitle${nc}"
+	echo -e "\n  by $channeltitle"
 	echo -e "\n$description"
 	pdate=$(date -d "$pubdate" "+%A %-d %B, %Y")
 	echo -e "\n  Published: $pdate"
@@ -131,7 +133,7 @@ handle_input () {
 				command_line "Invalid number"
 			fi
 			;;
-		[SDFJKLERIO] )
+		[ASDFJKLERI] )
             userinput=${numbers[${userinput,,}]}
             if [[ "$player" = "mpv" ]] && [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput - 1 ))
@@ -241,4 +243,3 @@ draw_search () {
 }
 
 ytsearch
-
