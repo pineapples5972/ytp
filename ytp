@@ -38,15 +38,15 @@ fi
 searchterm=$1
 
 if [[ "$searchterm" = "" ]]; then
-    searchterm="village people ymca"
+    searchterm="friday"
 fi
 
 api_url="https://www.googleapis.com/youtube/v3/search"
 video_url="https://www.youtube.com/watch?v="
 pagenum=1
 searchtype="search"
-letters=(s d f j k l w e i o)
-declare -A numbers=([s]=1 [d]=2 [f]=3 [j]=4 [k]=5 [l]=6 [w]=7 [e]=8 [i]=9 [o]=10)
+letters=(a s d f j k l w e i)
+declare -A numbers=([a]=1 [s]=2 [d]=3 [f]=4 [j]=5 [k]=6 [l]=7 [w]=8 [e]=9 [i]=10)
 
 ytsearch () {
 	echo "Searching ..."
@@ -67,7 +67,12 @@ search_related () {
 	draw_search
 }
 search_header () {
-	echo -e "Searched for: $searchterm\nPage: $pagenum\n"
+	if [[ "$searchtype" = "search" ]]; then
+		echo -e "Searched for: $searchterm"
+	else
+		echo -e "Related to: $vidtitle"
+	fi
+	echo -e "Page: $pagenum\n"
 }
 search_footer () {
 	echo -e "\nEnter a ${magenta}number${nc} to watch the video in $player."
@@ -112,7 +117,7 @@ details_footer () {
 
 handle_input () {
 	case $userinput in
-		[sdfjklerio] )
+		[asdfjkleri] )
 			selectedvid=$(( ${numbers[$userinput]} - 1 ))
 			draw_details $selectedvid
 			;;
@@ -131,7 +136,7 @@ handle_input () {
             if [[ "$player" = "mpv" ]] && [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput - 1 ))
 				echo "Launching $player"
-				$player --no-video $video_url${vididsa[$playvid]} 1>/dev/null 2>&1
+				$player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
 				command_line
 			else
 				command_line "Invalid command"
