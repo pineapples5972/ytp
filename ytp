@@ -4,6 +4,7 @@
 ## by drew
 ## also anjune
 ## uo.is.ou@gmail.com
+## https://gitlab.com/uoou/ytp
 ## GPL v. 2
 
 api_key="AIzaSyB-7sMMx9lMexjq3ZWZAzw3Csi7zOF98nE"
@@ -65,6 +66,7 @@ search_related () {
 	next=$(echo $videolist | jq -r "[.][].nextPageToken")
 	draw_search
 }
+
 search_header () {
 	if [[ "$searchtype" = "search" ]]; then
 		echo -e "Searched for: $searchterm"
@@ -73,6 +75,7 @@ search_header () {
 	fi
 	echo -e "Page: $pagenum\n"
 }
+
 search_footer () {
 	if $showhelp; then
 		echo -e "Enter a ${magenta}number${nc} to watch the video in $player. Add a ${bold}!${nc} to add to playlist."
@@ -150,6 +153,7 @@ new_maxresults () {
 	fi
 
 }
+
 command_line () {
 	if [[ ! -z "$1" ]]; then
 		echo $1
