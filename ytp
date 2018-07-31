@@ -118,7 +118,11 @@ draw_details () {
 
 details_footer () {
 	if $showhelp; then
-		echo -e "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+		echo -en "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+		if hash xclip 2>/dev/null; then
+			echo -en ", [${green}y${nc}] copy url to clipboard"
+		fi
+		echo ""
 	fi
 	command_line
 }
@@ -282,6 +286,15 @@ handle_input () {
 			;;
 		b )
 			draw_search
+			;;
+		y )
+			if hash xclip 2>/dev/null && [[ "$vidid" != "" ]]; then
+				echo "$video_url$vidid" | xclip -selection clipboard
+				echo "url copied to clipboard"
+				command_line
+			else
+				command_line "Invalid command"
+			fi
 			;;
 		q|:q|exit|close|quit )
 			exit
