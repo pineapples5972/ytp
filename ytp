@@ -191,6 +191,7 @@ play_audio_only () {
     echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
     if [ -z "$DISPLAY" ]; then 
         $player --no-video $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 
+        echo # insert newline to compensate for ^C
     else
         $player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
     fi
