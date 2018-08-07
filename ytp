@@ -187,6 +187,15 @@ draw_search () {
 	command_line
 }
 
+play_audio_only () {
+    echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
+    if [ -z "$DISPLAY" ]; then 
+        $player --no-video $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 
+    else
+        $player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
+    fi
+}
+
 handle_input () {
 	case $userinput in
 		[asdfjkleri] )
@@ -207,8 +216,7 @@ handle_input () {
 			userinput=${numbers[${userinput,,}]}
 			if [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput - 1 ))
-				echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
-				$player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
+				play_audio_only
 				command_line
 			else
 				command_line "Invalid command"
@@ -247,14 +255,13 @@ handle_input () {
 			new_maxresults
 			;;
 		w )
-			echo -e "Opening ${red}$vidtitle${nc} in $player"
+			play_videoecho -e "Opening ${red}$vidtitle${nc} in $player"
 			$player $video_url$vidid 1>/dev/null 2>&1 &
 			command_line
 			;;
 		u )
-			echo -e "Opening ${red}$vidtitle${nc} (audio only) in $player"
-			$player --no-video --player-operation-mode=pseudo-gui $video_url$vidid 1>/dev/null 2>&1 &
-			command_line
+			play_audio_only
+            command_line
 			;;
 		m )
 			if [[ -z "$vidid" ]]; then
