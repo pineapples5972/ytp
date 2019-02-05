@@ -98,7 +98,7 @@ search_footer () {
 			fi
 			nexttext="$nexttext$nextsep[${green}p${nc}]revious page"
 		fi
-		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle showing of help ${bold}OR${nc} just enter a search term"
+		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle help ${bold}OR${nc} just enter a search term"
 		if [[ ! -z $playlistfile ]]; then
 			nexttext="$nexttext, [${green}t${nc}] play playlist"
 		fi
