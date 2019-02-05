@@ -123,10 +123,11 @@ draw_details () {
 
 details_footer () {
 	if $showhelp; then
-		echo -en "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
+		echo -en "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search ${bold}OR${nc} just enter a search term"
 		if hash xclip 2>/dev/null; then
 			echo -en ", [${green}y${nc}] copy url to clipboard"
 		fi
+		echo -en " ${bold}OR${nc} just enter a search term"
 		echo ""
 	fi
 	command_line
