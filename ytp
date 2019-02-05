@@ -98,7 +98,7 @@ search_footer () {
 			fi
 			nexttext="$nexttext$nextsep[${green}p${nc}]revious page"
 		fi
-		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle showing of help"
+		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle showing of help ${bold}OR${nc} just enter a search term"
 		if [[ ! -z $playlistfile ]]; then
 			nexttext="$nexttext, [${green}t${nc}] play playlist"
 		fi
@@ -313,7 +313,10 @@ handle_input () {
 			exit
 			;;
 		* )
-			command_line "Invalid command"
+			searchterm=$userinput
+			pagenum=1
+			searchtype="search"
+			ytsearch
 			;;
 	esac
 }
