@@ -98,10 +98,11 @@ search_footer () {
 			fi
 			nexttext="$nexttext$nextsep[${green}p${nc}]revious page"
 		fi
-		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle help ${bold}OR${nc} just enter a search term"
+		nexttext="$nexttext, [${green}x${nc}] new search, [${green}c${nc}]hange max results, [${green}?${nc}] toggle help"
 		if [[ ! -z $playlistfile ]]; then
 			nexttext="$nexttext, [${green}t${nc}] play playlist"
 		fi
+		nexttext="$nexttext, OR${nc} just enter a search term"
 		echo -e $nexttext
 	fi
 }
@@ -123,7 +124,7 @@ draw_details () {
 
 details_footer () {
 	if $showhelp; then
-		echo -en "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search ${bold}OR${nc} just enter a search term"
+		echo -en "[${green}w${nc}]atch, [${green}u${nc}] play audio, [${green}m${nc}] see related videos, [${green}b${nc}]ack to search"
 		if hash xclip 2>/dev/null; then
 			echo -en ", [${green}y${nc}] copy url to clipboard"
 		fi
