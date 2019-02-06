@@ -119,7 +119,7 @@ search_footer () {
 		if [[ ! -z $playlistfile ]]; then
 			nexttext="$nexttext, [${green}t${nc}] play playlist"
 		fi
-		nexttext="$nexttext, OR${nc} just enter a search term"
+		nexttext="$nexttext, ${bold}OR${nc} just enter a search term"
 		echo -e $nexttext
 	fi
 }
