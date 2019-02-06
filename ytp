@@ -8,7 +8,9 @@
 ## GPL v. 2
 
 api_key="AIzaSyD1fB7RN49FrFpEeCU6TJhtMQkmbwoyaGg"
-#Ceate your own here: https://console.developers.google.com/
+# These API keys have limits. If the script inexplicably fails
+# create your own here: https://console.developers.google.com/
+# following these instructions: https://www.slickremix.com/docs/get-api-key-for-youtube/
 
 maxresults=5
 player="mpv" # mpv works, try other players at your own P E R I L
