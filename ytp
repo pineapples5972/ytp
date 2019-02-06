@@ -83,7 +83,10 @@ compose_data () {
 	mapfile -t pubdates_array < <( printf "%s\n" "$pubdates" )
 	descriptions=$(echo $videolist | jq -r "[.][].items[].snippet.description")
 	mapfile -t descriptions_array < <( printf "%s\n" "$descriptions" )
-
+	for n in "${!vidids_array[@]}"; do
+		durations_array[$n]=$(curl -G "${api_url}videos/" --data-urlencode "id=${vidids_array[$n]}" --data-urlencode "part=contentDetails"
+--data-urlencode "key=$api_key" --data-urlencode "fields=items(contentDetails/duration)" | jq -r "[.][].items[].contentDetails.duration")
+	done
 	draw_search
 }
 
@@ -192,6 +195,7 @@ draw_search () {
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
 		echo -en "[${yellow}${letters[$v]^^}${nc}] "
+		echo -en "${durations_array[$v]}"
 		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitles_array[$v]}${nc}"
 	done
 	echo ""
