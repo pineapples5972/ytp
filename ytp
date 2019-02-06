@@ -3,7 +3,7 @@
 ## ytp
 ## by drew
 ## also anjune
-## uo.is.ou@gmail.com
+## uoou@posteo.net 
 ## https://gitlab.com/uoou/ytp
 ## GPL v. 2
 
@@ -27,7 +27,7 @@ for thing in jq youtube-dl mktemp $player; do
 		then
 			echo -n "Older versions of youtube-dl might not be able to process all videos. If playback fails, try grabbing the latest version with Python's package installer, using 'sudo -H pip3 install youtube-dl'."
 		fi
-		echo 
+		echo ""
 		exit
 	fi
 done
@@ -280,7 +280,7 @@ handle_input () {
 			;;
 		u )
 			play_audio_only
-            command_line
+			command_line
 			;;
 		m )
 			if [[ -z "$vidid" ]]; then
