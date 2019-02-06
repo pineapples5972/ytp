@@ -125,6 +125,8 @@ search_footer () {
 }
 
 draw_details () {
+	vidid=${vidids_array[$1]}
+	vidtitle=${vidtitles_array[$1]}
 	echo -e "\n  ${bold}${red}${vidtitles_array[$1]}${nc} (${durations_array[$1]})"
 	echo -e "  by ${channeltitles_array[$1]}"
 	echo -e "\n${descriptions_array[$1]}"
