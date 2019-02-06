@@ -62,14 +62,14 @@ ytsearch () {
 	fi
 	prev=$(echo $videolist | jq -r "[.][].prevPageToken")
 	next=$(echo $videolist | jq -r "[.][].nextPageToken")
-	compose_data $videolist
+	compose_data
 }
 
 search_related () {
 	videolist=$(curl -G "${api_url}search/" --data-urlencode "key=$api_key" --data-urlencode "part=snippet" --data-urlencode "type=video" --data-urlencode "maxResults=$maxresults" --data-urlencode "fields=items(snippet/title,snippet/channelTitle,snippet/description,snippet/publishedAt,id/videoId),nextPageToken,prevPageToken" --data-urlencode "relatedToVideoId=$vidid" 2>/dev/null)
 	prev=$(echo $videolist | jq -r "[.][].prevPageToken")
 	next=$(echo $videolist | jq -r "[.][].nextPageToken")
-	compose_data $videolist
+	compose_data
 }
 
 compose_data () {
@@ -84,7 +84,7 @@ compose_data () {
 	descriptions=$(echo $videolist | jq -r "[.][].items[].snippet.description")
 	mapfile -t descriptions_array < <( printf "%s\n" "$descriptions" )
 	for n in "${!vidids_array[@]}"; do
-		durations_array[$n]=$(curl -G "${api_url}videos/" --data-urlencode "key=$api_key" --data-urlencode "id=${vidids_array[$n]}" --data-urlencode "part=contentDetails" --data-urlencode "fields=items(contentDetails/duration)" | jq -r "[.][].items[].contentDetails.duration")
+		durations_array[$n]=$(curl -G "${api_url}videos/" --data-urlencode "key=$api_key" --data-urlencode "id=${vidids_array[$n]}" --data-urlencode "part=contentDetails" --data-urlencode "fields=items(contentDetails/duration)" 2>/dev/null | jq -r "[.][].items[].contentDetails.duration" | sed -e 's/P\|T\|S//g; s/D\|H\|M/:/g' -e 's/\<[0-9]\>/0&/g')
 	done
 	draw_search
 }
@@ -125,7 +125,7 @@ search_footer () {
 }
 
 draw_details () {
-	echo -e "\n  ${bold}${red}${vidtitles_array[$1]}${nc}"
+	echo -e "\n  ${bold}${red}${vidtitles_array[$1]}${nc} (${durations_array[$1]})"
 	echo -e "  by ${channeltitles_array[$1]}"
 	echo -e "\n${descriptions_array[$1]}"
 	pdate=$(date -d "${pubdates_array[$1]}" "+%A %-d %B, %Y")
@@ -194,8 +194,9 @@ draw_search () {
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
 		echo -en "[${yellow}${letters[$v]^^}${nc}] "
-		echo -en "${durations_array[$v]}"
-		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitles_array[$v]}${nc}"
+		echo -en "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitles_array[$v]}${nc}"
+		echo -en " (${durations_array[$v]})"
+		echo -e " by ${red}${channeltitles_array[$v]}${nc}"
 	done
 	echo ""
 	search_footer
