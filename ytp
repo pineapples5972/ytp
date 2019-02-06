@@ -7,8 +7,9 @@
 ## https://gitlab.com/uoou/ytp
 ## GPL v. 2
 
-api_key="AIzaSyB-7sMMx9lMexjq3ZWZAzw3Csi7zOF98nE"
-# these API keys have quotas. If you hit limits, create your own here: https://console.developers.google.com/
+api_key=""
+#Ceate your own here: https://console.developers.google.com/
+
 maxresults=5
 player="mpv" # mpv works, try other players at your own P E R I L
 
