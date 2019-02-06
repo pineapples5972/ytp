@@ -8,17 +8,9 @@ Searches and plays Youtube stuff.
 
 `jq`, `youtube-dl` and `mpv`.
 
-A google API key from here: https://console.developers.google.com/
-
-(This is hugely inconvenient and I'm looking into a better way)
-
 ## Installation
 
-It's a bash script. Copy & paste/git clone/curl it.
-
-Enter your Google API key on line 10.
-
-`chmod +x` it and put it in your path.
+It's a bash script. Copy & paste/git clone/curl it, `chmod +x` it and put it in your path.
 
 ## Ting
 
