@@ -62,13 +62,21 @@ ytsearch () {
 	fi
 	prev=$(echo $videolist | jq -r "[.][].prevPageToken")
 	next=$(echo $videolist | jq -r "[.][].nextPageToken")
-	draw_search
+	compose_data $videolist
 }
 
 search_related () {
 	videolist=$(curl -G "$api_url" --data-urlencode "key=$api_key" --data-urlencode "part=snippet" --data-urlencode "type=video" --data-urlencode "maxResults=$maxresults" --data-urlencode "fields=items(snippet/title,snippet/channelTitle,snippet/description,snippet/publishedAt,id/videoId),nextPageToken,prevPageToken" --data-urlencode "relatedToVideoId=$vidid" 2>/dev/null)
 	prev=$(echo $videolist | jq -r "[.][].prevPageToken")
 	next=$(echo $videolist | jq -r "[.][].nextPageToken")
+	compose_data $videolist
+}
+
+compose_data () {
+	vidids=$(echo $videolist | jq -r "[.][].items[].id.videoId")
+	mapfile -t vidids_array < <( printf "%s\n" "$vidids" )
+	vidtitles=$(echo $videolist | jq -r "[.][].items[].snippet.title")
+	mapfile -t vidtitles_array < <( printf "%s\n" "$vidtitles" )
 	draw_search
 }
 
@@ -140,8 +148,8 @@ add_to_playlist () {
 		playlistfile="$playlistfile/playlist.m3u"
 		firstitem=true
 	fi
-	echo $video_url${vididsa[$1]} >> $playlistfile
-	echo -e "Added ${red}${vidtitlesa[$1]}${nc} to playlist."
+	echo $video_url${vidids_array[$1]} >> $playlistfile
+	echo -e "Added ${red}${vidtitles_array[$1]}${nc} to playlist."
 	if $firstitem; then
 		echo -e "([${green}t${nc}] to play playlist)"
 		firstitem=false
@@ -175,11 +183,7 @@ command_line () {
 
 draw_search () {
 	search_header
-	vidids=$(echo $videolist | jq -r "[.][].items[].id.videoId")
-	mapfile -t vididsa < <( printf "%s\n" "$vidids" )
-	vidtitles=$(echo $videolist | jq -r "[.][].items[].snippet.title")
-	mapfile -t vidtitlesa < <( printf "%s\n" "$vidtitles" )
-	for v in "${!vididsa[@]}"; do
+	for v in "${!vidids_array[@]}"; do
 		n=$(( $v + 1 ))
 		sep=" "
 		if [ "$n" -ge 10 ]; then
@@ -187,7 +191,7 @@ draw_search () {
 		fi
 		echo -en "  $sep${magenta}$n${nc}. "
 		echo -en "[${yellow}${letters[$v]^^}${nc}] "
-		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitlesa[$v]}${nc}"
+		echo -e "[${cyan}${letters[$v]}${nc}] ${bold}${vidtitles_array[$v]}${nc}"
 	done
 	echo ""
 	search_footer
@@ -195,12 +199,12 @@ draw_search () {
 }
 
 play_audio_only () {
-    echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} (audio only) in $player"
+    echo -e "Opening ${red}${vidtitles_array[$playvid]}${nc} (audio only) in $player"
     if [ -z "$DISPLAY" ]; then 
-        $player --no-video $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 
+        $player --no-video $video_url${vidids_array[$playvid]} 1>/dev/null 2>&1 
         echo # insert newline to compensate for ^C
     else
-        $player --no-video --player-operation-mode=pseudo-gui $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
+        $player --no-video --player-operation-mode=pseudo-gui $video_url${vidids_array[$playvid]} 1>/dev/null 2>&1 &
     fi
 }
 
@@ -213,8 +217,8 @@ handle_input () {
 		[1-9]|10 )
 			if [[ $userinput -le $maxresults ]]; then
 				playvid=$(( $userinput -1 ))
-				echo -e "Opening ${red}${vidtitlesa[$playvid]}${nc} in $player"
-				$player $video_url${vididsa[$playvid]} 1>/dev/null 2>&1 &
+				echo -e "Opening ${red}${vidtitles_array[$playvid]}${nc} in $player"
+				$player $video_url${vidids_array[$playvid]} 1>/dev/null 2>&1 &
 				command_line
 			else
 				command_line "Invalid number"
