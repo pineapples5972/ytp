@@ -123,12 +123,12 @@ search_footer () {
 }
 
 draw_details () {
-	echo -e "\n  ${bold}${red}$vidtitles_array[$1]${nc}"
-	echo -e "  by $channeltitles_array[$1]"
-	echo -e "\n$descriptions_array[$1]"
-	pdate=$(date -d "$pubdates_array[$1]" "+%A %-d %B, %Y")
+	echo -e "\n  ${bold}${red}${vidtitles_array[$1]}${nc}"
+	echo -e "  by ${channeltitles_array[$1]}"
+	echo -e "\n${descriptions_array[$1]}"
+	pdate=$(date -d "${pubdates_array[$1]}" "+%A %-d %B, %Y")
 	echo -e "\n  Published: $pdate"
-	echo -e "  url: $video_url$vidids_array[$1]\n"
+	echo -e "  url: $video_url${vidids_array[$1]}\n"
 	details_footer
 }
 
