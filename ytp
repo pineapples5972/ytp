@@ -77,6 +77,13 @@ compose_data () {
 	mapfile -t vidids_array < <( printf "%s\n" "$vidids" )
 	vidtitles=$(echo $videolist | jq -r "[.][].items[].snippet.title")
 	mapfile -t vidtitles_array < <( printf "%s\n" "$vidtitles" )
+	channeltitles=$(echo $videolist | jq -r "[.][].items[].snippet.channelTitle")
+	mapfile -t channeltitles_array < <( printf "%s\n" "$channeltitles" )
+	pubdates=$(echo $videolist | jq -r "[.][].items[].snippet.publishedAt")
+	mapfile -t pubdates_array < <( printf "%s\n" "$pubdates" )
+	descriptions=$(echo $videolist | jq -r "[.][].items[].snippet.description")
+	mapfile -t descriptions_array < <( printf "%s\n" "$descriptions" )
+
 	draw_search
 }
 
@@ -116,17 +123,12 @@ search_footer () {
 }
 
 draw_details () {
-	vidid=$(echo $videolist | jq -r "[.][].items[$1].id.videoId")
-	vidtitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.title")
-	channeltitle=$(echo $videolist | jq -r "[.][].items[$1].snippet.channelTitle")
-	pubdate=$(echo $videolist | jq -r "[.][].items[$1].snippet.publishedAt")
-	description=$(echo $videolist | jq -r "[.][].items[$1].snippet.description")
-	echo -e "\n  ${bold}${red}$vidtitle${nc}"
-	echo -e "  by $channeltitle"
-	echo -e "\n$description"
-	pdate=$(date -d "$pubdate" "+%A %-d %B, %Y")
+	echo -e "\n  ${bold}${red}$vidtitles_array[$1]${nc}"
+	echo -e "  by $channeltitles_array[$1]"
+	echo -e "\n$descriptions_array[$1]"
+	pdate=$(date -d "$pubdates_array[$1]" "+%A %-d %B, %Y")
 	echo -e "\n  Published: $pdate"
-	echo -e "  url: $video_url$vidid\n"
+	echo -e "  url: $video_url$vidids_array[$1]\n"
 	details_footer
 }
 
