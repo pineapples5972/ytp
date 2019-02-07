@@ -20,7 +20,7 @@ Then just replace it in line 10 of the script.
 
 ## Installation
 
-It's a bash script. Copy & paste/git clone/curl it, `chmod +x` it and put it in your path.
+It's a bash script. Copy & paste/git clone/curl it, `chmod +x` it and put it in your path (after checking it doesn't do bad things (it doesn't do bad things)).
 
 ## Ting
 
