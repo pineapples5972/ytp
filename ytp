@@ -86,9 +86,10 @@ compose_data () {
 	mapfile -t pubdates_array < <( printf "%s\n" "$pubdates" )
 	descriptions=$(echo $videolist | jq -r "[.][].items[].snippet.description")
 	mapfile -t descriptions_array < <( printf "%s\n" "$descriptions" )
-	for n in "${!vidids_array[@]}"; do
-		durations_array[$n]=$(curl -G "${api_url}videos/" --data-urlencode "key=$api_key" --data-urlencode "id=${vidids_array[$n]}" --data-urlencode "part=contentDetails" --data-urlencode "fields=items(contentDetails/duration)" 2>/dev/null | jq -r "[.][].items[].contentDetails.duration" | sed -e 's/P\|T\|S//g; s/D\|H\|M/:/g' -e 's/\<[0-9]\>/0&/g')
-	done
+	printf -v vidids_csv ",%s" "${vidids_array[@]}"
+	vidids_csv=${vidids_csv:1}
+	durations=$(curl -G "${api_url}videos/" --data-urlencode "key=$api_key" --data-urlencode "id=$vidids_csv" --data-urlencode "part=contentDetails" --data-urlencode "fields=items(contentDetails/duration)" 2>/dev/null | jq -r "[.][].items[].contentDetails.duration" | sed -e 's/P\|T\|S//g; s/D\|H\|M/:/g' -e 's/\<[0-9]\>/0&/g')
+	mapfile -t durations_array < <( printf "%s\n" "$durations" )
 	draw_search
 }
 
