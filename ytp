@@ -28,7 +28,7 @@ for thing in jq youtube-dl mktemp $player; do
 		echo -en "This script requires ${magenta}$thing${nc}. It's probably in your repos. "
 		if [[ "$thing" = "youtube-dl" ]] ;
 		then
-			echo -n "Older versions of youtube-dl might not be able to process all videos. If playback fails, try installing/upgrading to the latest version with Python's package installer, using 'pip3 install --upgrade youtube-dl' (with or without sudo; up to you!)"
+			echo -n "Older versions of youtube-dl might not be able to process all videos. If playback fails, try installing/upgrading to the latest version with Python's package installer, using 'pip3 install --user --upgrade youtube-dl'."
 		fi
 		echo ""
 		exit
