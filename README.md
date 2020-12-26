@@ -1,3 +1,5 @@
+THIS REPOSITORY IS CLONED/FORKED FROM https://gitlab.com/uoou/ytp
+
 # ytp
 
 Searches and plays Youtube stuff.
